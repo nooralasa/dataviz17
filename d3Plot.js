@@ -12,20 +12,20 @@ var margin = {top: 20, right: 20, bottom: 30, left: 40},
 var time = 76
 
 // setup x 
-var xValue = function(d) { return d["Voltagge"];}, // data -> value
+var xValue = function(d) { return d["Calcium"];}, // data -> value
     xScale = d3.scale.linear().range([0, width]), // value -> display
     xMap = function(d) { return xScale(xValue(d));}, // data -> display
     xAxis = d3.svg.axis().scale(xScale).orient("bottom");
 
 // setup y
-var yValue = function(d) { return d["Calcium"];}, // data -> value
+var yValue = function(d) { return d["Voltage"];}, // data -> value
     yScale = d3.scale.linear().range([height, 0]), // value -> display
     yMap = function(d) { return yScale(yValue(d));}, // data -> display
     yAxis = d3.svg.axis().scale(yScale).orient("left");
 
 // setup fill color
 var cValue = function(d) { return d.Protein;},
-    color = d3.scale.category10();
+    color = d3.scale.category20c();
 
 // add the graph canvas to the body of the webpage
 var svg = d3.select("#plot").append("svg")
@@ -50,14 +50,14 @@ d3.csv("data/sample_data.csv", function(error, data) {
   // change string (from CSV) into number format
   data.forEach(function(d, i) {
     d["Calcium"] = +d["Calcium"];
-    d["Voltagge"] = +d["Voltagge"];
+    d["Voltage"] = +d["Voltage"];
     d["Time (min)"] = +d["Time (min)"];
 //    console.log(d);
   });
 
   // don't want dots overlapping axis, so add in buffer to data domain
-  xScale.domain([d3.min(data, xValue)-1, d3.max(data, xValue)+1]);
-  yScale.domain([d3.min(data, yValue)-1, d3.max(data, yValue)+1]);
+  xScale.domain([d3.min(data, xValue)-.1, d3.max(data, xValue)+.1]);
+  yScale.domain([d3.min(data, yValue)-.5, d3.max(data, yValue)+.5]);
 
   // x-axis
   svg.append("g")
@@ -69,7 +69,7 @@ d3.csv("data/sample_data.csv", function(error, data) {
       .attr("x", width)
       .attr("y", -6)
       .style("text-anchor", "end")
-      .text("Voltagge");
+      .text("Voltage");
 
   // y-axis
   svg.append("g")
@@ -99,7 +99,7 @@ d3.csv("data/sample_data.csv", function(error, data) {
           tooltip.transition()
                .duration(200)
                .style("opacity", .9);
-          tooltip.html("Time: " + d["Time (min)"] +  "<br/> Voltage: " + d["Voltagge"] +  "<br/> Calcium: " + d["Calcium"] + "<br/> LFP: " + d["LFP"] + "<br/> Protein: " + d["Protein"] + "<br/> Gene: " + d["Gene"])
+          tooltip.html("Time: " + d["Time (min)"] +  "<br/> Voltage: " + d["Voltage"] +  "<br/> Calcium: " + d["Calcium"] + "<br/> LFP: " + d["LFP"] + "<br/> Protein: " + d["Protein"] + "<br/> Gene: " + d["Gene"])
                .style("left", (d3.event.pageX + 5) + "px")
                .style("top", (d3.event.pageY - 28) + "px");
         }

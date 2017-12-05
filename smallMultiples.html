@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+  font: 10px sans-serif;
+  margin: 0;
+}
+
+.line {
+  fill: none;
+  stroke: #666;
+  stroke-width: 1.5px;
+}
+
+.area {
+  fill: #e7e7e7;
+}
+
+</style>
+<body>
+<script src="lib/d3.v3.min.js"></script>
+<script>
+
+var margin = {top: 8, right: 10, bottom: 2, left: 10},
+    width = 960 - margin.left - margin.right,
+    height = 69 - margin.top - margin.bottom;
+
+var x = d3.time.scale()
+    .range([0, width]);
+
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+var area = d3.svg.area()
+    .x(function(d) { return x(d.time); })
+    .y0(height)
+    .y1(function(d) { return y(d.value); });
+
+var line = d3.svg.line()
+    .x(function(d) { return x(d.time); })
+    .y(function(d) { return y(d.value); });
+
+d3.csv("data/small_multiples.csv", function(error, data) {
+
+  data.forEach(function(d) {
+    d.value = +d.value;
+    d.time = +d.time;
+    d.type = d.type;
+    console.log(d);
+  });
+
+  // Nest data by symbol.
+  var symbols = d3.nest()
+      .key(function(d) { return d.type; })
+      .entries(data);
+
+  // Compute the maximum price per symbol, needed for the y-domain.
+  symbols.forEach(function(s) {
+    s.maxValue = d3.max(s.values, function(d) { return d.value; });
+    s.maxTime = d3.max(s.values, function(d) { return d.time; });
+    // console.log("maxValue", typeof s.maxValue)
+  });
+
+  // Add an SVG element for each symbol, with the desired dimensions and margin.
+  var svg = d3.select("body").selectAll("svg")
+      .data(symbols)
+    .enter().append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  // Add the area path elements. Note: the y-domain is set per element.
+  svg.append("path")
+      .attr("class", "area")
+      .attr("d", function(d) { x.domain([0, d.maxTime]);  y.domain([0, d.maxValue]); return area(d.values); });
+
+  // Add the line path elements. Note: the y-domain is set per element.
+  svg.append("path")
+      .attr("class", "line")
+      .attr("d", function(d) { x.domain([0, d.maxTime]); y.domain([0, d.maxValue]); return line(d.values); });
+
+  // Add a small label for the symbol name.
+  svg.append("text")
+      .attr("x", width - 6)
+      .attr("y", height - 6)
+      .style("text-anchor", "end")
+      .text(function(d) { return d.key; });
+});
+
+</script>
