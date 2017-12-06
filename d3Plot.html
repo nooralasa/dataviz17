@@ -40,9 +40,23 @@ body {
 <body>
 <script src="lib/d3.v3.min.js"></script>
 <script src="lib/d3.slider.js"></script>
-<div id="plot"></div>
+<script src="lib/simpleD3Slider.js"></script>
+
+<div id="container" style="width: 1024px; height: 500px;">
+  <div id="plot" style="width: 960px; float: left;"></div>
+  <div id="cells" style="width: 64px; float: left;"></div>
+</div>
+
 <br/>
-<div id="slider1" style="width: 960px;"></div>
+
+
+
+<div id="slider-container" style="margin-left: 40px; width: 960px; position:absolute;">
+  <div id="slider-text" style="width: 100px; float: left;">Time:</div>
+  <div id="slider1" style="margin-left: 40px; width: 800px; position:absolute;"></div>
+</div>
+
+
 <script src="./d3Plot.js"> </script>
 </body>
 </html>
